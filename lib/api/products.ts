@@ -79,9 +79,8 @@ export async function getProductIdsForStaticPaths(
 ): Promise<number[]> {
   const result = await platziGet<Product[]>(
     `/products${buildQuery({ limit, offset: 0 })}`,
-    { revalidate: 86400 }
+    { next: { revalidate: 86400 } }
   );
-
   if (result.error || !result.data) return [];
   return result.data.map((p) => p.id);
 }
