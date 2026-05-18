@@ -66,9 +66,9 @@ async function platzyFetch<T>(
 
 export async function platziGet<T>(
   path: string,
-  nextOptions?: RequestInit["next"]
+  options?: Pick<RequestInit, "cache" | "next">
 ): Promise<ApiResult<T>> {
-  return platzyFetch<T>(path, { next: nextOptions });
+  return platzyFetch<T>(path, options);
 }
 
 export async function platziPost<T>(

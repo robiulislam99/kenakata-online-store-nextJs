@@ -29,8 +29,6 @@ export async function getProducts(
     price_max: params.price_max,
     categoryId: params.categoryId,
   });
-
-  // no-store = always fetch fresh data from API (SSR behaviour)
   return platziGet<Product[]>(`/products${query}`, {
     cache: "no-store",
   });
@@ -43,7 +41,7 @@ export async function getProductById(
   id: number
 ): Promise<ApiResult<Product>> {
   return platziGet<Product>(`/products/${id}`, {
-    revalidate: 86400, // 24 hours in seconds
+    next: { revalidate: 86400 },
   });
 }
 
@@ -54,9 +52,8 @@ export async function getFeaturedProducts(
   limit: number = 8
 ): Promise<ApiResult<Product[]>> {
   const query = buildQuery({ limit, offset: 0 });
-
   return platziGet<Product[]>(`/products${query}`, {
-    revalidate: 3600, // 1 hour in seconds
+    next: { revalidate: 3600 },
   });
 }
 
@@ -69,13 +66,10 @@ export async function getProductsByCategory(
   offset: number = 0
 ): Promise<ApiResult<Product[]>> {
   const query = buildQuery({ limit, offset });
-
-  return platziGet<Product[]>(
-    `/categories/${categoryId}/products${query}`,
-    { revalidate: 3600 }
-  );
+  return platziGet<Product[]>(`/categories/${categoryId}/products${query}`, {
+    next: { revalidate: 3600 },
+  });
 }
-
 // ── Get IDs of the first N products for generateStaticParams ──
 // Used by: app/(shop)/products/[id]/page.tsx
 // Next.js calls this at build time to pre-render popular pages.
