@@ -21,11 +21,12 @@ import type {
   ApiResult,
 } from "@/types";
 
-// ── Login ─────────────────────────────────────────────────────
-// Returns access_token and refresh_token from the API.
-// Our route handler stores these in cookies — they never
-// reach the browser's JavaScript.
+const API_BASE =
+  process.env.API_BASE_URL ??
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  "https://api.escuelajs.co/api/v1";
 
+// ── Login ─────────────────────────────────────────────────────
 export async function loginUser(
   payload: LoginPayload
 ): Promise<ApiResult<AuthTokens>> {
@@ -33,49 +34,48 @@ export async function loginUser(
 }
 
 // ── Register ──────────────────────────────────────────────────
-// Creates a new user account. Returns the created User object.
-
 export async function registerUser(
   payload: RegisterPayload
 ): Promise<ApiResult<User>> {
-  return platziPost<User>("/users/", payload);
+  return platziPost<User>("/users", payload);  // ← no trailing slash
 }
 
 // ── Get current user profile ──────────────────────────────────
-// Fetches the profile for the authenticated user.
-// Requires the Authorization header with a Bearer token.
-
 export async function getUserProfile(
   accessToken: string
 ): Promise<ApiResult<User>> {
-  return platziGet<User>("/auth/profile", {
-    // No caching — always fresh. Also we need to pass the token.
-    cache: "no-store",
-    // We pass the token via a workaround because platziGet's
-    // second argument is RequestInit["next"]. For auth calls,
-    // we use platziGet with a headers override below.
-  });
-  // NOTE: The above doesn't pass the header yet.
-  // See the comment in platziGet — for authenticated calls
-  // use the pattern below directly where needed, or we'll
-  // create an authenticated variant in a later phase.
+  try {
+    const res = await fetch(`${API_BASE}/auth/profile`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("[getUserProfile] failed:", res.status, data);
+      return { data: null, error: data?.message ?? "Failed to fetch profile" };
+    }
+
+    return { data, error: null };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Network error";  // ← fix
+    console.error("[getUserProfile] threw:", err);
+    return { data: null, error: message };
+  }
 }
 
 // ── Refresh access token ──────────────────────────────────────
-// Platzi's API uses a refresh token to get a new access token.
-
 export async function refreshAccessToken(
   refreshToken: string
 ): Promise<ApiResult<AuthTokens>> {
-  return platziPost<AuthTokens>("/auth/refresh-token", {
-    refreshToken,
-  });
+  return platziPost<AuthTokens>("/auth/refresh-token", { refreshToken });
 }
 
 // ── Verify a token ────────────────────────────────────────────
-// Platzi provides a verify endpoint to check if a token is
-// still valid without decoding it on the client.
-
 export async function verifyToken(
   token: string
 ): Promise<ApiResult<boolean>> {

@@ -20,6 +20,12 @@ const nextConfig: NextConfig = {
         hostname: "api.escuelajs.co",
         pathname: "/**",
       },
+      // Lorem Space placeholder images
+      {
+        protocol: "https",
+        hostname: "api.lorem.space",
+        pathname: "/**",
+      },
       // Platzi often returns images from placeimg.com
       {
         protocol: "https",

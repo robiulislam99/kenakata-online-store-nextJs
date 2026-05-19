@@ -1,15 +1,22 @@
-// components/layout/navbar.tsx
+// components/layout/navbar.tsx  (REPLACE existing)
 // ─────────────────────────────────────────────────────────────
 // NAVBAR — SERVER COMPONENT
-// Updated: replaced static cart icon with CartNavIcon (client)
-// which shows the live cart item count from Zustand.
+// Updated: added UserMenu client island for auth state.
+//
+// CLIENT ISLANDS in this server component:
+//   NavLinks   → usePathname() for active state
+//   ThemeToggle → useTheme() for dark mode
+//   CartNavIcon → useCartStore() for live cart count
+//   UserMenu   → useAuthContext() for login/logout state
+//   MobileMenu → useState() for hamburger open/close
 // ─────────────────────────────────────────────────────────────
 
-import Link from "next/link";
-import { NavLinks }    from "./nav-links";
-import { MobileMenu }  from "./mobile-menu";
+import Link          from "next/link";
+import { NavLinks }   from "./nav-links";
+import { MobileMenu } from "./mobile-menu";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { CartNavIcon } from "./cart-nav-icon";
+import { UserMenu }    from "./user-menu";
 
 export function Navbar() {
   return (
@@ -27,15 +34,14 @@ export function Navbar() {
             <span>Kata</span>
           </Link>
 
-          {/* Desktop navigation */}
+          {/* Desktop nav links */}
           <NavLinks className="hidden md:flex gap-1" />
 
           {/* Right-side actions */}
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            {/* CartNavIcon: client component with live badge count */}
             <CartNavIcon />
-            {/* Mobile hamburger */}
+            <UserMenu />
             <MobileMenu />
           </div>
         </div>
