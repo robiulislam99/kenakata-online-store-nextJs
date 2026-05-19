@@ -15,8 +15,8 @@ import type { Category, ApiResult } from "@/types";
 
 export async function getCategories(): Promise<ApiResult<Category[]>> {
   return platziGet<Category[]>("/categories", {
-    revalidate: 3600,
-  });
+  next: { revalidate: 3600 },
+});
 }
 
 // ── Get a single category by ID ───────────────────────────────
@@ -26,8 +26,8 @@ export async function getCategoryById(
   id: number
 ): Promise<ApiResult<Category>> {
   return platziGet<Category>(`/categories/${id}`, {
-    revalidate: 3600,
-  });
+  next: { revalidate: 3600 },
+});
 }
 
 // ── Admin: Create a category ──────────────────────────────────
