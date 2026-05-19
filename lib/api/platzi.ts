@@ -16,11 +16,14 @@
 import type { ApiResult } from "@/types";
 
 // ── Base URL ──────────────────────────────────────────────────
-// Reads from environment. Falls back to the real API URL so the
-// app doesn't crash if .env.local is missing during development.
+// API_BASE_URL        → server-side only (Route Handlers, Server Components)
+// NEXT_PUBLIC_*       → client bundle fallback
+// Hardcoded string    → last resort so the app never crashes on missing .env
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.escuelajs.co/api/v1";
+  process.env.API_BASE_URL ??                       // ← NEW: server-side var
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  "https://api.escuelajs.co/api/v1";
 
 // ── Core fetch wrapper ────────────────────────────────────────
 
@@ -40,8 +43,12 @@ async function platzyFetch<T>(
     });
 
     if (!response.ok) {
-      // Surface the HTTP status as a readable error string
       const errorText = await response.text().catch(() => response.statusText);
+      // ← NEW: log exact Platzi error to terminal so you can see it
+      console.error(
+        `[platziFetch] ${options.method ?? "GET"} ${url} → ${response.status}:`,
+        errorText
+      );
       return { data: null, error: `HTTP ${response.status}: ${errorText}` };
     }
 
@@ -55,6 +62,7 @@ async function platzyFetch<T>(
   } catch (err) {
     // Network error or JSON parse error
     const message = err instanceof Error ? err.message : "Unknown error";
+    console.error(`[platziFetch] ${options.method ?? "GET"} ${url} threw:`, err); // ← NEW
     return { data: null, error: message };
   }
 }
