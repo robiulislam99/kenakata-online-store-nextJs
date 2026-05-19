@@ -14,7 +14,7 @@
 | Role | Email | Password |
 |---|---|---|
 | Customer | `john@mail.com` | `changeme` |
-| Admin | `admin@mail.com` | `admin123` |
+
 
 ---
 
