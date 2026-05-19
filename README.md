@@ -7,11 +7,8 @@
 
 ## 🚀 Live Demo
 
-**[kenakata.vercel.app](https://kenakatashop.netlify.app/** 
+**[kenakatashop.netify.app](https://kenakatashop.netlify.app/** 
 
-| Storefront | 
-|---|---|
-| [kenakat.vercel.app](https://kenakatashop.netlify.app/) | 
 
 **Demo credentials**
 | Role | Email | Password |
